@@ -91,6 +91,137 @@
             font-size: 0.8rem;
             color: #666;
         }
+
+        /* --- GÜNLÜK ÇARK WIDGET BUTONU (SOL ALT KÖŞE) --- */
+        .wheel-widget-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #ffff00;
+            color: #000;
+            border: 3px solid #ff007f;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 10px;
+            box-shadow: 0 0 15px #ffff00;
+            z-index: 999;
+            animation: pulse 1.5s infinite alternate;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 10px #ffff00; }
+            100% { transform: scale(1.05); box-shadow: 0 0 25px #ff007f; }
+        }
+
+        /* --- MODAL DIŞ ARKA PLAN --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #110222;
+            border: 4px solid #33ffff;
+            box-shadow: 0 0 30px #33ffff;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            position: relative;
+            max-width: 400px;
+            width: 90%;
+        }
+        .close-modal {
+            position: absolute;
+            top: 10px; right: 15px;
+            color: #ff007f;
+            font-size: 1.5rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* --- ÇARK TASARIMI --- */
+        .wheel-box {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            margin: 20px auto;
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 25px solid #ff007f;
+            z-index: 10;
+            filter: drop-shadow(0 0 5px #ff007f);
+        }
+        .wheel-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 5px solid #fff;
+            box-shadow: 0 0 15px #fff;
+            background: conic-gradient(
+                #ff007f 0deg 90deg, 
+                #33ffff 90deg 180deg, 
+                #00ff66 180deg 270deg, 
+                #ffff00 270deg 360deg
+            );
+            transition: transform 4s cubic-bezier(0.1, 0.8, 0.1, 1);
+            position: relative;
+        }
+        /* Çark üzerindeki yazı konumlandırmaları */
+        .slice-text {
+            position: absolute;
+            font-weight: bold;
+            color: #000;
+            font-size: 1.1rem;
+            width: 50%;
+            height: 50%;
+            transform-origin: bottom right;
+            text-align: right;
+            padding-right: 25px;
+            box-sizing: border-box;
+            top: 0; left: 0;
+        }
+        .st1 { transform: rotate(45deg); color: #fff; }
+        .st2 { transform: rotate(135deg); }
+        .st3 { transform: rotate(225deg); }
+        .st4 { transform: rotate(315deg); }
+
+        .wheel-btn {
+            background: #00ff66;
+            color: #000;
+            border: none;
+            padding: 10px 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 0 4px 0 #009933;
+            font-family: monospace;
+        }
+        .wheel-btn:disabled {
+            background: #444;
+            color: #888;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+        #wheel-status {
+            margin-top: 15px;
+            font-size: 1rem;
+            color: #ffff00;
+            min-height: 20px;
+        }
     </style>
 </head>
 <body>
@@ -105,19 +236,19 @@
 
     <h2>OYUN SEÇİNİZ</h2>
     <div class="games-grid">
-        <div class="game-card" onclick="window.location.href='Slot1.html'">
+        <div class="game-card" onclick="window.location.href='slot1.html'">
             <h3>NEON FRUITS</h3>
             <p>Slot Oyunu 1</p>
             <p style="font-size: 0.8rem; color:#aaa;">RTP: %35.5</p>
             <button class="btn">Oyna</button>
         </div>
-        <div class="game-card" onclick="window.location.href='Slot2.html'">
+        <div class="game-card" onclick="window.location.href='slot2.html'">
             <h3>CYBER SPACE</h3>
             <p>Slot Oyunu 2</p>
             <p style="font-size: 0.8rem; color:#aaa;">RTP: %35.5</p>
             <button class="btn">Oyna</button>
         </div>
-        <div class="game-card" onclick="window.location.href='Slot3.html'">
+        <div class="game-card" onclick="window.location.href='slot3.html'">
             <h3>PIXEL DIAMONDS</h3>
             <p>Slot Oyunu 3</p>
             <p style="font-size: 0.8rem; color:#aaa;">RTP: %35.5</p>
@@ -132,26 +263,131 @@
     </div>
 </div>
 
+<button class="wheel-widget-btn" onclick="openWheelModal()">🎁 GÜNLÜK ÇARK</button>
+
+<div class="modal-overlay" id="wheelModal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeWheelModal()">X</span>
+        <h2 style="color: #33ffff; margin-top: 10px;">ŞANS ÇARKI</h2>
+        <p style="font-size: 0.8rem; color: #aaa;">Her gün 1 ücretsiz jeton kazanma hakkı!</p>
+        
+        <div class="wheel-box">
+            <div class="wheel-pointer"></div>
+            <div class="wheel-canvas" id="wheel">
+                <div class="slice-text st1">250</div>
+                <div class="slice-text st2">1000</div>
+                <div class="slice-text st3">750</div>
+                <div class="slice-text st4">500</div>
+            </div>
+        </div>
+
+        <button class="wheel-btn" id="spin-wheel-btn" onclick="spinWheel()">ÇARKI ÇEVİR</button>
+        <div id="wheel-status"></div>
+    </div>
+</div>
+
 <footer>
     <p>© 2026 Retro Arcade - Tüm Hakları Saklıdır.</p>
 </footer>
 
 <script>
+    // Bakiye kontrol mekanizması
     if (localStorage.getItem('arcade_coins') === null) {
         localStorage.setItem('arcade_coins', '1000');
     }
-    document.getElementById('coin-display').innerText = localStorage.getItem('arcade_coins');
+    
+    function refreshBalance() {
+        document.getElementById('coin-display').innerText = localStorage.getItem('arcade_coins');
+    }
+    refreshBalance();
+
+    // MODAL AÇMA KAPATMA
+    function openWheelModal() {
+        document.getElementById('wheelModal').style.display = 'flex';
+        checkWheelCooldown();
+    }
+    function closeWheelModal() {
+        document.getElementById('wheelModal').style.display = 'none';
+    }
+
+    // SÜRE/COOLDOWN KONTROLÜ
+    function checkWheelCooldown() {
+        const lastSpin = localStorage.getItem('last_wheel_spin');
+        const btn = document.getElementById('spin-wheel-btn');
+        const status = document.getElementById('wheel-status');
+
+        if (lastSpin) {
+            const nextSpinAllowed = parseInt(lastSpin) + (24 * 60 * 60 * 1000); // 24 Saat Sonrası
+            const now = Date.now();
+
+            if (now < nextSpinAllowed) {
+                btn.disabled = true;
+                
+                // Kalan süreyi hesapla ve yazdır
+                const diff = nextSpinAllowed - now;
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                status.innerText = `Bugün çevirdiniz! Kalan süre: ${hours}sa ${minutes}dk ${seconds}sn`;
+                status.style.color = "#ff007f";
+                
+                // Her saniye süreyi güncellemek için timeout tetikle
+                setTimeout(checkWheelCooldown, 1000);
+                return;
+            }
+        }
+        btn.disabled = false;
+        status.innerText = "Çark çevrilmeye hazır!";
+        status.style.color = "#00ff66";
+    }
+
+    // ÇARK ÇEVİRME AKSİYONU
+    let isWheelSpinning = false;
+    function spinWheel() {
+        if (isWheelSpinning) return;
+        isWheelSpinning = true;
+
+        const btn = document.getElementById('spin-wheel-btn');
+        btn.disabled = true;
+
+        // Rastgele bir ödül dilimi seç (0 ile 3 arası)
+        // 0 = 250, 1 = 1000, 2 = 750, 3 = 500
+        const prizes = [250, 1000, 750, 500];
+        const randomIndex = Math.floor(Math.random() * prizes.length);
+        const prizeWon = prizes[randomIndex];
+
+        // Derece hesabı (Her dilim 90 derece. İbre en üstte olduğu için açıları ona göre kaydırıyoruz)
+        const baseRotations = 5 * 360; // En az 5 tam tur atsın (görsel şölen için)
+        const targetDeg = baseRotations + (randomIndex * 90) + 45; 
+
+        const wheel = document.getElementById('wheel');
+        wheel.style.transform = `rotate(-${targetDeg}deg)`; // Saat yönünün tersine çeviriyoruz ki yazılar tam eşleşsin
+
+        document.getElementById('wheel-status').innerText = "Çark dönüyor, bol şans...";
+        document.getElementById('wheel-status').style.color = "#ffff00";
+
+        // Animasyon süresi sonu (4 saniye)
+        setTimeout(() => {
+            // Bakiyeyi güncelle
+            let currentCoins = parseInt(localStorage.getItem('arcade_coins')) || 0;
+            currentCoins += prizeWon;
+            localStorage.setItem('arcade_coins', currentCoins.toString());
+            
+            // Zaman damgasını kaydet (24 saatlik kilidi devreye sokar)
+            localStorage.setItem('last_wheel_spin', Date.now().toString());
+
+            // Arayüz güncellemeleri
+            refreshBalance();
+            document.getElementById('wheel-status').innerText = `TEBRİKLER! Hediye Kampanyasından +${prizeWon} Coin Kazandınız!`;
+            document.getElementById('wheel-status').style.color = "#00ff66";
+            
+            isWheelSpinning = false;
+            // Cooldown sayacını başlat
+            checkWheelCooldown();
+        }, 4000);
+    }
 </script>
-<!-- Start of LiveChat (www.livechat.com) code -->
-<script>
-    window.__lc = window.__lc || {};
-    window.__lc.license = 19789419;
-    window.__lc.integration_name = "manual_channels";
-    window.__lc.product_name = "livechat";
-    ;(function(n,t,c){function i(n){return e._h?e._h.apply(null,n):e._q.push(n)}var e={_q:[],_h:null,_v:"2.0",on:function(){i(["on",c.call(arguments)])},once:function(){i(["once",c.call(arguments)])},off:function(){i(["off",c.call(arguments)])},get:function(){if(!e._h)throw new Error("[LiveChatWidget] You can't use getters before load.");return i(["get",c.call(arguments)])},call:function(){i(["call",c.call(arguments)])},init:function(){var n=t.createElement("script");n.async=!0,n.type="text/javascript",n.src="https://cdn.livechatinc.com/tracking.js",t.head.appendChild(n)}};!n.__lc.asyncInit&&e.init(),n.LiveChatWidget=n.LiveChatWidget||e}(window,document,[].slice))
-</script>
-<noscript><a href="https://www.livechat.com/chat-with/19789419/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
-<!-- End of LiveChat code -->
 
 </body>
 </html>
