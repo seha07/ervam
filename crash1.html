@@ -23,7 +23,7 @@
             box-shadow: 0 0 25px #ff007f;
         }
         .title { color: #ff007f; text-shadow: 0 0 10px #ff007f; margin-top: 5px;}
-        .back-btn { background: #333; color: #fff; border: none; padding: 5px 15px; cursor: pointer; margin-bottom: 15px;}
+        .back-btn { background: #333; color: #fff; border: none; padding: 5px 15px; cursor: pointer; margin-bottom: 15px; font-family: monospace;}
         
         .game-screen {
             background: #000;
@@ -125,10 +125,37 @@
     let hasCashout = false;
     let currentBet = 0;
 
+    // KÖPRÜ: Giriş yapmış kullanıcının güncel bakiyesini çekme
+    function syncBalanceFromUser() {
+        let activeUser = localStorage.getItem('active_arcade_session');
+        if (activeUser) {
+            let userDb = JSON.parse(localStorage.getItem('arcade_users')) || {};
+            if (userDb[activeUser]) {
+                localStorage.setItem('arcade_coins', userDb[activeUser].coins.toString());
+            }
+        } else if (localStorage.getItem('arcade_coins') === null) {
+            localStorage.setItem('arcade_coins', '1000');
+        }
+    }
+
     function updateBalanceDisplay() {
+        syncBalanceFromUser();
         document.getElementById('balance').innerText = localStorage.getItem('arcade_coins');
     }
     updateBalanceDisplay();
+
+    // KÖPRÜ: Oyun içi bakiye değişimini kullanıcı veri tabanına yazma fonksiyonu
+    function saveBalanceToUser(newCoins) {
+        localStorage.setItem('arcade_coins', newCoins.toString());
+        let activeUser = localStorage.getItem('active_arcade_session');
+        if (activeUser) {
+            let userDb = JSON.parse(localStorage.getItem('arcade_users')) || {};
+            if (userDb[activeUser]) {
+                userDb[activeUser].coins = newCoins;
+                localStorage.setItem('arcade_users', JSON.stringify(userDb));
+            }
+        }
+    }
 
     const screen = document.getElementById('screen');
     for (let i = 0; i < 20; i++) {
@@ -142,6 +169,7 @@
     function startRound() {
         if (isPlaying) return;
 
+        syncBalanceFromUser();
         let coins = parseInt(localStorage.getItem('arcade_coins')) || 0;
         let bet = parseInt(document.getElementById('bet-input').value);
 
@@ -156,7 +184,9 @@
 
         coins -= bet;
         currentBet = bet;
-        localStorage.setItem('arcade_coins', coins.toString());
+        
+        // Cüzdanı kaydet ve güncelle
+        saveBalanceToUser(coins);
         updateBalanceDisplay();
 
         isPlaying = true;
@@ -169,7 +199,6 @@
         document.getElementById('status-log').innerText = "Uçak havalandı... Dikkatli olun!";
         document.getElementById('status-log').style.color = "#ffff00";
 
-        // %42.5 RTP KONTROLÜ
         let rtpCheck = Math.random();
         if (rtpCheck < 0.425) {
             crashMultiplier = 1.20 + (Math.random() * 4.5); 
@@ -214,7 +243,9 @@
         
         let coins = parseInt(localStorage.getItem('arcade_coins')) || 0;
         coins += winAmount;
-        localStorage.setItem('arcade_coins', coins.toString());
+        
+        // Cüzdanı kaydet ve güncelle
+        saveBalanceToUser(coins);
         
         document.getElementById('status-log').innerText = `BAŞARILI NAKİT ÇEKİM! ${winMultiplier.toFixed(2)}x Oranından +${winAmount} Coin Kazandınız!`;
         document.getElementById('status-log').style.color = "#00ff66";
@@ -251,7 +282,7 @@
         document.getElementById('cashout-btn').style.display = 'none';
     }
 </script>
-<!-- Start of LiveChat (www.livechat.com) code -->
+    <!-- Start of LiveChat (www.livechat.com) code -->
 <script>
     window.__lc = window.__lc || {};
     window.__lc.license = 19789419;
