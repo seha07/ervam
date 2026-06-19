@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Aviator - Crash Oyunu</title>
+    <style>
+        body {
+            background-color: #0d021a;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .machine {
+            max-width: 700px;
+            margin: 30px auto;
+            background: #15062b;
+            border: 5px solid #ff007f;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 25px #ff007f;
+        }
+        .title { color: #ff007f; text-shadow: 0 0 10px #ff007f; margin-top: 5px;}
+        .back-btn { background: #333; color: #fff; border: none; padding: 5px 15px; cursor: pointer; margin-bottom: 15px;}
+        
+        .game-screen {
+            background: #000;
+            border: 3px solid #33ffff;
+            border-radius: 10px;
+            height: 300px;
+            position: relative;
+            overflow: hidden;
+            margin: 20px 0;
+            box-shadow: inset 0 0 15px rgba(51, 255, 255, 0.3);
+        }
+        #multiplier-display {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5rem;
+            color: #ffff00;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ffff00;
+            z-index: 10;
+        }
+        #plane {
+            position: absolute;
+            font-size: 2.5rem;
+            bottom: 20px;
+            left: 20px;
+            transition: bottom 0.1s linear, left 0.1s linear;
+        }
+        .controls {
+            background: #221133;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ff007f;
+        }
+        input[type="number"] {
+            background: #000;
+            color: #00ff66;
+            border: 2px solid #33ffff;
+            padding: 8px;
+            font-size: 1.2rem;
+            width: 100px;
+            text-align: center;
+            font-family: monospace;
+        }
+        .btn-action {
+            font-size: 1.3rem;
+            font-weight: bold;
+            padding: 10px 25px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-left: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        .bet-btn { background: #00ff66; color: #000; box-shadow: 0 4px 0 #009933; }
+        .cashout-btn { background: #ffff00; color: #000; box-shadow: 0 4px 0 #999900; display: none; }
+        .btn-action:active { transform: translateY(2px); box-shadow: none; }
+        
+        .status-box { font-size: 1.1rem; color: #00ff66; min-height: 25px; margin-top: 10px; }
+        
+        .star {
+            position: absolute;
+            background: #fff;
+            width: 2px;
+            height: 2px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="machine">
+    <button class="back-btn" onclick="window.location.href='index.html'"><- Salon Menüsüne Dön</button>
+    <h1 class="title">✈️ RETRO AVIATOR ✈️</h1>
+    <div style="font-size: 1.2rem;">Bakiye: <span id="balance" style="color:#00ff66; font-weight:bold;">0</span> Coin</div>
+    
+    <div class="game-screen" id="screen">
+        <div id="multiplier-display">1.00x</div>
+        <div id="plane">✈️</div>
+    </div>
+
+    <div class="controls">
+        <label>BAHİS (1-100 Coin): </label>
+        <input type="number" id="bet-input" value="10" min="1" max="100">
+        
+        <button id="bet-btn" class="btn-action bet-btn" onclick="startRound()">BAHİS YAP VE UÇUR</button>
+        <button id="cashout-btn" class="btn-action cashout-btn" onclick="cashout()">NAKİT ÇEK</button>
+    </div>
+
+    <div class="status-box" id="status-log">Bahis miktarınızı ayarlayın ve uçuşu başlatın!</div>
+</div>
+
+<script>
+    let currentMultiplier = 1.00;
+    let crashMultiplier = 1.00;
+    let gameInterval = null;
+    let isPlaying = false;
+    let hasCashout = false;
+    let currentBet = 0;
+
+    function updateBalanceDisplay() {
+        document.getElementById('balance').innerText = localStorage.getItem('arcade_coins');
+    }
+    updateBalanceDisplay();
+
+    const screen = document.getElementById('screen');
+    for (let i = 0; i < 20; i++) {
+        let star = document.createElement('div');
+        star.className = 'star';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.left = Math.random() * 100 + '%';
+        screen.appendChild(star);
+    }
+
+    function startRound() {
+        if (isPlaying) return;
+
+        let coins = parseInt(localStorage.getItem('arcade_coins')) || 0;
+        let bet = parseInt(document.getElementById('bet-input').value);
+
+        if (isNaN(bet) || bet < 1 || bet > 100) {
+            alert("Lütfen 1 ile 100 arasında bir bahis giriniz!");
+            return;
+        }
+        if (coins < bet) {
+            alert("Yetersiz bakiye!");
+            return;
+        }
+
+        coins -= bet;
+        currentBet = bet;
+        localStorage.setItem('arcade_coins', coins.toString());
+        updateBalanceDisplay();
+
+        isPlaying = true;
+        hasCashout = false;
+        currentMultiplier = 1.00;
+        
+        document.getElementById('bet-input').disabled = true;
+        document.getElementById('bet-btn').style.display = 'none';
+        document.getElementById('cashout-btn').style.display = 'inline-block';
+        document.getElementById('status-log').innerText = "Uçak havalandı... Dikkatli olun!";
+        document.getElementById('status-log').style.color = "#ffff00";
+
+        // %42.5 RTP KONTROLÜ
+        let rtpCheck = Math.random();
+        if (rtpCheck < 0.425) {
+            crashMultiplier = 1.20 + (Math.random() * 4.5); 
+        } else {
+            crashMultiplier = 1.00 + (Math.random() * 0.18); 
+        }
+
+        const plane = document.getElementById('plane');
+        plane.style.bottom = '20px';
+        plane.style.left = '20px';
+        plane.innerText = "✈️";
+
+        gameInterval = setInterval(() => {
+            currentMultiplier += 0.03 + (currentMultiplier * 0.015);
+            
+            if (currentMultiplier >= crashMultiplier) {
+                clearInterval(gameInterval);
+                document.getElementById('multiplier-display').innerText = "CRASH! @" + crashMultiplier.toFixed(2) + "x";
+                document.getElementById('multiplier-display').style.color = "#ff007f";
+                plane.innerText = "💥";
+                endRound();
+            } else {
+                document.getElementById('multiplier-display').innerText = currentMultiplier.toFixed(2) + "x";
+                document.getElementById('multiplier-display').style.color = "#ffff00";
+                
+                let progressRatio = (currentMultiplier - 1) / 5;
+                if(progressRatio > 1) progressRatio = 1;
+                plane.style.left = (20 + progressRatio * 70) + '%';
+                plane.style.bottom = (20 + progressRatio * 60) + '%';
+            }
+        }, 100);
+    }
+
+    function cashout() {
+        if (!isPlaying || hasCashout) return;
+        
+        hasCashout = true;
+        clearInterval(gameInterval);
+        
+        let winMultiplier = currentMultiplier;
+        let winAmount = Math.floor(currentBet * winMultiplier);
+        
+        let coins = parseInt(localStorage.getItem('arcade_coins')) || 0;
+        coins += winAmount;
+        localStorage.setItem('arcade_coins', coins.toString());
+        
+        document.getElementById('status-log').innerText = `BAŞARILI NAKİT ÇEKİM! ${winMultiplier.toFixed(2)}x Oranından +${winAmount} Coin Kazandınız!`;
+        document.getElementById('status-log').style.color = "#00ff66";
+        
+        updateBalanceDisplay();
+        document.getElementById('cashout-btn').style.display = 'none';
+        
+        gameInterval = setInterval(() => {
+            currentMultiplier += 0.04;
+            if (currentMultiplier >= crashMultiplier) {
+                clearInterval(gameInterval);
+                document.getElementById('multiplier-display').innerText = "CRASH! @" + crashMultiplier.toFixed(2) + "x";
+                document.getElementById('multiplier-display').style.color = "#ff007f";
+                document.getElementById('plane').innerText = "💥";
+                resetControlsAfterFlight();
+            } else {
+                document.getElementById('multiplier-display').innerText = currentMultiplier.toFixed(2) + "x";
+            }
+        }, 100);
+    }
+
+    function endRound() {
+        if (!hasCashout) {
+            document.getElementById('status-log').innerText = "Uçak düştü! Bahsi kaybettiniz.";
+            document.getElementById('status-log').style.color = "#ff007f";
+        }
+        resetControlsAfterFlight();
+    }
+
+    function resetControlsAfterFlight() {
+        isPlaying = false;
+        document.getElementById('bet-input').disabled = false;
+        document.getElementById('bet-btn').style.display = 'inline-block';
+        document.getElementById('cashout-btn').style.display = 'none';
+    }
+</script>
+<!-- Start of LiveChat (www.livechat.com) code -->
+<script>
+    window.__lc = window.__lc || {};
+    window.__lc.license = 19789419;
+    window.__lc.integration_name = "manual_channels";
+    window.__lc.product_name = "livechat";
+    ;(function(n,t,c){function i(n){return e._h?e._h.apply(null,n):e._q.push(n)}var e={_q:[],_h:null,_v:"2.0",on:function(){i(["on",c.call(arguments)])},once:function(){i(["once",c.call(arguments)])},off:function(){i(["off",c.call(arguments)])},get:function(){if(!e._h)throw new Error("[LiveChatWidget] You can't use getters before load.");return i(["get",c.call(arguments)])},call:function(){i(["call",c.call(arguments)])},init:function(){var n=t.createElement("script");n.async=!0,n.type="text/javascript",n.src="https://cdn.livechatinc.com/tracking.js",t.head.appendChild(n)}};!n.__lc.asyncInit&&e.init(),n.LiveChatWidget=n.LiveChatWidget||e}(window,document,[].slice))
+</script>
+<noscript><a href="https://www.livechat.com/chat-with/19789419/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
+<!-- End of LiveChat code -->
+
+</body>
+</html>
