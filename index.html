@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Atari Salonu - Ana Sayfa</title>
+    <style>
+        body {
+            background-color: #120422;
+            color: #00ff66;
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-image: radial-gradient(#341547 20%, transparent 20%), radial-gradient(#1a0b2e 20%, transparent 20%);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+        }
+        .arcade-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: #000;
+            border: 4px solid #ff007f;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 30px #ff007f, inset 0 0 20px #ff007f;
+        }
+        h1 {
+            font-size: 3rem;
+            color: #33ffff;
+            text-shadow: 0 0 10px #33ffff, 0 0 20px #33ffff;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #ff007f;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+        }
+        .stats-box {
+            background: #222;
+            border: 2px dashed #33ffff;
+            display: inline-block;
+            padding: 10px 30px;
+            font-size: 1.5rem;
+            color: #ffff00;
+            text-shadow: 0 0 5px #ffff00;
+            margin-bottom: 40px;
+        }
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .game-card {
+            background: #111;
+            border: 3px solid #00ff66;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .game-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #00ff66;
+        }
+        .game-card h3 {
+            color: #ffff00;
+            margin-top: 0;
+        }
+        .btn {
+            background: #ff007f;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #99004c;
+            border-radius: 5px;
+        }
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+        footer {
+            margin-top: 50px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="arcade-container">
+    <h1>RETRO ARCADE</h1>
+    <div class="subtitle">Hoş Geldiniz - Eğlence Amaçlıdır</div>
+    
+    <div class="stats-box">
+        MEVCUT JETONUZ: <span id="coin-display">1000</span> COIN
+    </div>
+
+    <h2>OYUN SEÇİNİZ</h2>
+    <div class="games-grid">
+        <div class="game-card" onclick="window.location.href='Slot1.html'">
+            <h3>NEON FRUITS</h3>
+            <p>Slot Oyunu 1</p>
+            <p style="font-size: 0.8rem; color:#aaa;">RTP: %35.5</p>
+            <button class="btn">Oyna</button>
+        </div>
+        <div class="game-card" onclick="window.location.href='Slot2.html'">
+            <h3>CYBER SPACE</h3>
+            <p>Slot Oyunu 2</p>
+            <p style="font-size: 0.8rem; color:#aaa;">RTP: %35.5</p>
+            <button class="btn">Oyna</button>
+        </div>
+        <div class="game-card" onclick="window.location.href='Slot3.html'">
+            <h3>PIXEL DIAMONDS</h3>
+            <p>Slot Oyunu 3</p>
+            <p style="font-size: 0.8rem; color:#aaa;">RTP: %35.5</p>
+            <button class="btn">Oyna</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>© 2026 Retro Arcade - Tüm Hakları Saklıdır.</p>
+</footer>
+
+<script>
+    // Kullanıcı ilk defa giriyorsa 1000 coin tanımla, varsa mevcut bakiyeyi çek
+    if (localStorage.getItem('arcade_coins') === null) {
+        localStorage.setItem('arcade_coins', '1000');
+    }
+    document.getElementById('coin-display').innerText = localStorage.getItem('arcade_coins');
+</script>
+<!-- Start of LiveChat (www.livechat.com) code -->
+<script>
+    window.__lc = window.__lc || {};
+    window.__lc.license = 19789419;
+    window.__lc.integration_name = "manual_channels";
+    window.__lc.product_name = "livechat";
+    ;(function(n,t,c){function i(n){return e._h?e._h.apply(null,n):e._q.push(n)}var e={_q:[],_h:null,_v:"2.0",on:function(){i(["on",c.call(arguments)])},once:function(){i(["once",c.call(arguments)])},off:function(){i(["off",c.call(arguments)])},get:function(){if(!e._h)throw new Error("[LiveChatWidget] You can't use getters before load.");return i(["get",c.call(arguments)])},call:function(){i(["call",c.call(arguments)])},init:function(){var n=t.createElement("script");n.async=!0,n.type="text/javascript",n.src="https://cdn.livechatinc.com/tracking.js",t.head.appendChild(n)}};!n.__lc.asyncInit&&e.init(),n.LiveChatWidget=n.LiveChatWidget||e}(window,document,[].slice))
+</script>
+<noscript><a href="https://www.livechat.com/chat-with/19789419/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
+<!-- End of LiveChat code -->
+
+</body>
+</html>
