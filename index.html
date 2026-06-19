@@ -17,7 +17,7 @@
             background-position: 0 0, 20px 20px;
         }
         .arcade-container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 50px auto;
             background: #000;
             border: 4px solid #ff007f;
@@ -100,7 +100,7 @@
     <div class="subtitle">Hoş Geldiniz - Eğlence Amaçlıdır</div>
     
     <div class="stats-box">
-        MEVCUT JETONUZ: <span id="coin-display">1000</span> COIN
+        MEVCUT JETONUNUZ: <span id="coin-display">1000</span> COIN
     </div>
 
     <h2>OYUN SEÇİNİZ</h2>
@@ -123,6 +123,12 @@
             <p style="font-size: 0.8rem; color:#aaa;">RTP: %35.5</p>
             <button class="btn">Oyna</button>
         </div>
+        <div class="game-card" onclick="window.location.href='crash1.html'">
+            <h3>RETRO AVIATOR</h3>
+            <p>Crash Oyunu 1</p>
+            <p style="font-size: 0.8rem; color:#aaa;">RTP: %42.5</p>
+            <button class="btn" style="background:#33ffff; color:#000; box-shadow: 0 4px 0 #009999;">Uçur</button>
+        </div>
     </div>
 </div>
 
@@ -131,7 +137,6 @@
 </footer>
 
 <script>
-    // Kullanıcı ilk defa giriyorsa 1000 coin tanımla, varsa mevcut bakiyeyi çek
     if (localStorage.getItem('arcade_coins') === null) {
         localStorage.setItem('arcade_coins', '1000');
     }
