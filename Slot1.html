@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Fruits - Slot 1</title>
+    <style>
+        body {
+            background-color: #120422;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .machine {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #222;
+            border: 5px solid #33ffff;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 25px #33ffff;
+        }
+        .title { color: #33ffff; text-shadow: 0 0 10px #33ffff; }
+        .back-btn { background: #555; color: #fff; border: none; padding: 5px 15px; cursor: pointer; margin-bottom: 20px;}
+        .reels {
+            display: flex;
+            justify-content: space-around;
+            background: #000;
+            padding: 20px;
+            border: 3px solid #ff007f;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .reel {
+            font-size: 4rem;
+            width: 100px;
+            height: 100px;
+            line-height: 100px;
+            background: #111;
+            border: 2px solid #fff;
+            border-radius: 5px;
+        }
+        .controls {
+            margin: 20px 0;
+        }
+        input[type="number"] {
+            background: #000;
+            color: #ffff00;
+            border: 2px solid #33ffff;
+            padding: 8px;
+            font-size: 1.2rem;
+            width: 100px;
+            text-align: center;
+            font-family: monospace;
+        }
+        .spin-btn {
+            background: #00ff66;
+            color: #000;
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 10px 30px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #009933;
+            border-radius: 5px;
+        }
+        .spin-btn:active { transform: translateY(4px); box-shadow: none; }
+        .status { font-size: 1.2rem; color: #ffff00; min-height: 30px; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="machine">
+    <button class="back-btn" onclick="window.location.href='index.html'"><- Geri Dön</button>
+    <h1 class="title">🍒 NEON FRUITS 🍇</h1>
+    <div>Bakiye: <span id="balance" style="color:#00ff66; font-weight:bold;">0</span> Coin</div>
+    
+    <div class="reels">
+        <div class="reel" id="r1">🍒</div>
+        <div class="reel" id="r2">🍋</div>
+        <div class="reel" id="r3">🍇</div>
+    </div>
+
+    <div class="controls">
+        <label>BAHİS (10-100): </label>
+        <input type="number" id="bet" value="10" min="10" max="100">
+        <button class="spin-btn" onclick="spin()">ÇEVİR</button>
+    </div>
+
+    <div class="status" id="status">Bahis miktarını seçip çevirin!</div>
+</div>
+
+<script>
+    const symbols = ['🍒', '🍋', '🍇', '🍉', '🔔', '7️⃣'];
+    
+    function updateBalance() {
+        document.getElementById('balance').innerText = localStorage.getItem('arcade_coins');
+    }
+    updateBalance();
+
+    function spin() {
+        let coins = parseInt(localStorage.getItem('arcade_coins'));
+        let bet = parseInt(document.getElementById('bet').value);
+
+        if (isNaN(bet) || bet < 10 || bet > 100) {
+            alert("Lütfen 10 ile 100 arasında geçerli bir bahis giriniz!");
+            return;
+        }
+        if (coins < bet) {
+            alert("Yetersiz bakiye! Jetonunuz bitti.");
+            return;
+        }
+
+        // Bakiyeden bet düş
+        coins -= bet;
+        localStorage.setItem('arcade_coins', coins.toString());
+        updateBalance();
+
+        // Matematiksel RTP %35.5 Kontrolü
+        // %35.5 ihtimalle kazanma havuzuna girer
+        let isWin = Math.random() < 0.355; 
+
+        let res1, res2, res3;
+
+        if (isWin) {
+            // Kazanma durumu: 3 sembol aynı gelir
+            let winSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+            res1 = winSymbol; res2 = winSymbol; res3 = winSymbol;
+            
+            // Ödül: Bahsin 3 katı geri ödenir
+            let prize = bet * 3;
+            coins += prize;
+            localStorage.setItem('arcade_coins', coins.toString());
+            
+            setTimeout(() => {
+                document.getElementById('status').innerText = `TEBRİKLER! +${prize} Coin Kazandınız!`;
+                document.getElementById('status').style.color = "#00ff66";
+                updateBalance();
+            }, 300);
+        } else {
+            // Kaybetme durumu: En az bir sembol farklı seçilir
+            res1 = symbols[Math.floor(Math.random() * symbols.length)];
+            res2 = symbols[Math.floor(Math.random() * symbols.length)];
+            res3 = symbols[Math.floor(Math.random() * symbols.length)];
+            
+            // Eğer şans eseri hepsi aynı çıkarsa bozmak için düzenleme:
+            if(res1 === res2 && res2 === res3) {
+                res3 = symbols[(symbols.indexOf(res3) + 1) % symbols.length];
+            }
+
+            setTimeout(() => {
+                document.getElementById('status').innerText = "Kaybettiniz! Tekrar Deneyin.";
+                document.getElementById('status').style.color = "#ff007f";
+            }, 300);
+        }
+
+        // Ekrana yansıtma
+        document.getElementById('r1').innerText = res1;
+        document.getElementById('r2').innerText = res2;
+        document.getElementById('r3').innerText = res3;
+    }
+</script>
+<!-- Start of LiveChat (www.livechat.com) code -->
+<script>
+    window.__lc = window.__lc || {};
+    window.__lc.license = 19789419;
+    window.__lc.integration_name = "manual_channels";
+    window.__lc.product_name = "livechat";
+    ;(function(n,t,c){function i(n){return e._h?e._h.apply(null,n):e._q.push(n)}var e={_q:[],_h:null,_v:"2.0",on:function(){i(["on",c.call(arguments)])},once:function(){i(["once",c.call(arguments)])},off:function(){i(["off",c.call(arguments)])},get:function(){if(!e._h)throw new Error("[LiveChatWidget] You can't use getters before load.");return i(["get",c.call(arguments)])},call:function(){i(["call",c.call(arguments)])},init:function(){var n=t.createElement("script");n.async=!0,n.type="text/javascript",n.src="https://cdn.livechatinc.com/tracking.js",t.head.appendChild(n)}};!n.__lc.asyncInit&&e.init(),n.LiveChatWidget=n.LiveChatWidget||e}(window,document,[].slice))
+</script>
+<noscript><a href="https://www.livechat.com/chat-with/19789419/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
+<!-- End of LiveChat code -->
+
+</body>
+</html>
